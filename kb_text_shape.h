@@ -27570,7 +27570,9 @@ static int kbts__ShapeRun(kbts_shape_context *Context, kbts_run *Run, int Versio
             Context->RunParagraphDirection = CodepointParagraphDirection;
           }
 
-          if(Initialized || NewLine)
+          // Glyphs already pushed before initialization (script-less leads such as "-") were mapped with RunFontInfo,
+          // so a font change has to end the run there instead of shaping them with the new font.
+          if(Initialized || NewLine || (!First && CodepointFontInfo && (CodepointFontInfo != RunFontInfo)))
           {
             // Rewind the current codepoint.
             // We could also try to peek the codepoint before advancing, but this seems fine.
